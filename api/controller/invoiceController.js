@@ -31,22 +31,12 @@ exports.fetchById = async (req, res) => {
         const {id} = req.params
         const invoice = await invoiceService.findById(id);
 
-        if(invoice.sqlError){
+        if(invoice.error){
             throw  { 
                 status: "error",
                 errors: {
-                    status: 500,
-                    message: invoice.sqlError
-                }  
-            }
-        }
-
-        if(invoice.length < 1){
-            throw  { 
-                status: "error",
-                errors: {
-                    status: 404,
-                    message: "La ressource est introuvable"
+                    status: invoice.status,
+                    message: invoice.error
                 }  
             }
         }
@@ -59,6 +49,7 @@ exports.fetchById = async (req, res) => {
         res.status(200).json(response)
     }
     catch(error){
+        console.log(error)
         const {status} = error.errors
         res.status(status).json(error)
     }

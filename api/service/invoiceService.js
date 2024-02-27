@@ -2,7 +2,7 @@ const db = require("../utils/database")
 
 exports.findAll = async () => {
     try{
-        const result = await db.execute("SELECT * FROM invoices INNER JOIN clients ON invoices.clientId = clients.id");
+        const result = await db.execute("SELECT invoices.id as id, invoiceNumber,title,createdAt,paymentDate,status,amount,clientId,lastName,firstName,email FROM invoices INNER JOIN clients ON invoices.clientId = clients.id");
         return result[0]
     }
     catch(error){
@@ -14,13 +14,21 @@ exports.findAll = async () => {
 
 exports.findById = async (id) => {
     try{
-        const result = await db.execute("SELECT * FROM invoices INNER JOIN clients ON invoices.clientId = clients.id WHERE invoices.id = ?", [id]);
+        const result = await db.execute("SELECT invoices.id as id, invoiceNumber,title,createdAt,paymentDate,status,amount,clientId,lastName,firstName,email FROM invoices INNER JOIN clients ON invoices.clientId = clients.id WHERE invoices.id = ?", [id]);
+
+       if(result[0].length == 0){
+            throw {
+                status: 404,
+                message: "la ressource est introuvable"
+            }
+       }
    
         return result[0][0]
     }
     catch(error){
         return {
-            sqlError: error.message
+            status: error.status? error.status : 500,
+            error: error.message
         }
     }
 }
